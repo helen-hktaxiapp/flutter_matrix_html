@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_html/flutter_html.dart';
+import 'package:flutter_matrix_html/flutter_html.dart';
 import 'package:html/dom.dart' as dom;
 
 void main() => runApp(new MyApp());
@@ -151,14 +151,14 @@ class _MyHomePageState extends State<MyHomePage> {
               }
               return null;
             },
-            customTextStyle: (dom.Node node, TextStyle baseStyle) {
+            customTextStyle: (dom.Node node, TextStyle? baseStyle) {
               if (node is dom.Element) {
                 switch (node.localName) {
                   case "p":
-                    return baseStyle.merge(TextStyle(height: 2, fontSize: 20));
+                    return baseStyle!.merge(TextStyle(height: 2, fontSize: 20));
                 }
               }
-              return baseStyle;
+              return baseStyle!;
             },
           ),
         ),

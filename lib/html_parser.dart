@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_html/rich_text_parser.dart';
+import 'package:flutter_matrix_html/rich_text_parser.dart';
 import 'package:html/dom.dart' as dom;
 import 'package:html/parser.dart' as parser;
 
@@ -28,7 +28,7 @@ class HtmlOldParser extends StatelessWidget {
   final double? blockSpacing;
   final String? html;
   final ImageErrorListener? onImageError;
-  final TextStyle linkStyle;
+  final TextStyle? linkStyle;
   final bool showImages;
 
   static const _supportedElements = [
@@ -119,7 +119,7 @@ class HtmlOldParser extends StatelessWidget {
 
   ///Parses an html string and returns a list of widgets that represent the body of your html document.
   List<Widget> parse(String? data) {
-    List<Widget> widgetList = new List<Widget>();
+    List<Widget> widgetList = [];
 
     if (renderNewlines) {
       data = data!.replaceAll("\n", "<br />");
@@ -635,7 +635,7 @@ class HtmlOldParser extends StatelessWidget {
             ),
           );
         case "q":
-          List<Widget> children = List<Widget>();
+          List<Widget> children = [];
           children.add(Text("\""));
           children.addAll(_parseNodeList(node.nodes));
           children.add(Text("\""));

@@ -1,8 +1,8 @@
 library flutter_html;
 
 import 'package:flutter/material.dart';
-import 'package:flutter_html/html_parser.dart';
-import 'package:flutter_html/rich_text_parser.dart';
+import 'package:flutter_matrix_html/html_parser.dart';
+import 'package:flutter_matrix_html/rich_text_parser.dart';
 
 import 'image_properties.dart';
 
@@ -41,7 +41,7 @@ class Html extends StatelessWidget {
   final double blockSpacing;
   final bool useRichText;
   final ImageErrorListener? onImageError;
-  final TextStyle linkStyle;
+  final TextStyle? linkStyle;
   final bool shrinkToFit;
 
   /// Properties for the Image widget that gets rendered by the rich text parser
