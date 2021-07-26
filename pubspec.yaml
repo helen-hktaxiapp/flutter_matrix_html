@@ -16,7 +16,7 @@ dependencies:
   matrix_link_text:
     git:
       url: https://github.com/helen-hktaxiapp/matrix_link_text
-      ref: 1dd76d5
+      ref: 80c73a2
   flutter_math_fork: ^0.3.0+2
   flutter_highlight: ^0.7.0
   isolate: ^2.0.3

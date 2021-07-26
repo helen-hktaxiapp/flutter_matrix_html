@@ -556,7 +556,7 @@ class HtmlRichTextParser extends StatelessWidget {
     ParseContext parseContext = ParseContext(
       rootWidgetList: widgetList,
       childStyle: DefaultTextStyle.of(context).style,
-      linkStyle: linkStyle ?? TextStyle(),
+      linkStyle: linkStyle,
       shrinkToFit: shrinkToFit,
       maxLines: maxLines,
       indentSize: indentSize,
