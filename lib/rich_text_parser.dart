@@ -7,15 +7,15 @@ import 'package:html/parser.dart' as parser;
 
 import 'image_properties.dart';
 
-typedef CustomRender = Widget Function(dom.Node node, List<Widget> children);
+typedef CustomRender = Widget? Function(dom.Node? node, List<Widget> children);
 typedef CustomTextStyle = TextStyle Function(
   dom.Node node,
-  TextStyle baseStyle,
+  TextStyle? baseStyle,
 );
-typedef CustomTextAlign = TextAlign Function(dom.Element elem);
+typedef CustomTextAlign = TextAlign? Function(dom.Element elem);
 typedef CustomEdgeInsets = EdgeInsets Function(dom.Node node);
-typedef OnLinkTap = void Function(String url);
-typedef OnImageTap = void Function(String source);
+typedef OnLinkTap = void Function(String? url);
+typedef OnImageTap = void Function(String? source);
 
 const OFFSET_TAGS_FONT_SIZE_FACTOR =
     0.7; //The ratio of the parent font for each of the offset tags: sup or sub
@@ -33,14 +33,14 @@ class LinkTextSpan extends TextSpan {
   // Since TextSpan itself is @immutable, this means that you would have to
   // manage the recognizer from outside the TextSpan, e.g. in the State of a
   // stateful widget that then hands the recognizer to the TextSpan.
-  final String url;
+  final String? url;
 
   LinkTextSpan(
-      {TextStyle style,
+      {TextStyle? style,
       this.url,
-      String text,
-      OnLinkTap onLinkTap,
-      List<TextSpan> children})
+      String? text,
+      OnLinkTap? onLinkTap,
+      List<TextSpan>? children})
       : super(
           style: style,
           text: text,
@@ -60,17 +60,17 @@ class LinkBlock extends Container {
   final List<Widget> children;
 
   LinkBlock({
-    String url,
-    EdgeInsets padding,
-    EdgeInsets margin,
-    OnLinkTap onLinkTap,
-    this.children,
+    String? url,
+    EdgeInsets? padding,
+    EdgeInsets? margin,
+    OnLinkTap? onLinkTap,
+    required this.children,
   }) : super(
           padding: padding,
           margin: margin,
           child: GestureDetector(
             onTap: () {
-              onLinkTap(url);
+              onLinkTap!(url);
             },
             child: Column(
               children: children,
@@ -81,14 +81,14 @@ class LinkBlock extends Container {
 
 class BlockText extends StatelessWidget {
   final RichText child;
-  final EdgeInsets padding;
-  final EdgeInsets margin;
-  final Decoration decoration;
-  final bool shrinkToFit;
+  final EdgeInsets? padding;
+  final EdgeInsets? margin;
+  final Decoration? decoration;
+  final bool? shrinkToFit;
 
   BlockText({
-    @required this.child,
-    @required this.shrinkToFit,
+    required this.child,
+    required this.shrinkToFit,
     this.padding,
     this.margin,
     this.decoration,
@@ -97,7 +97,7 @@ class BlockText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: shrinkToFit ? null : double.infinity,
+      width: shrinkToFit! ? null : double.infinity,
       padding: this.padding,
       margin: this.margin,
       decoration: this.decoration,
@@ -107,16 +107,16 @@ class BlockText extends StatelessWidget {
 }
 
 class ParseContext {
-  List<Widget> rootWidgetList; // the widgetList accumulator
+  List<Widget>? rootWidgetList; // the widgetList accumulator
   dynamic parentElement; // the parent spans accumulator
   int indentLevel = 0;
   int listCount = 0;
   String listChar = '•';
-  String blockType; // blockType can be 'p', 'div', 'ul', 'ol', 'blockquote'
+  String? blockType; // blockType can be 'p', 'div', 'ul', 'ol', 'blockquote'
   bool condenseWhitespace = true;
   bool spansOnly = false;
   bool inBlock = false;
-  TextStyle childStyle;
+  TextStyle? childStyle;
 
   ParseContext({
     this.rootWidgetList,
@@ -169,17 +169,17 @@ class HtmlRichTextParser extends StatelessWidget {
 
   final double indentSize = 10.0;
 
-  final bool shrinkToFit;
+  final bool? shrinkToFit;
   final onLinkTap;
   final bool renderNewlines;
-  final String html;
-  final CustomEdgeInsets customEdgeInsets;
-  final CustomTextStyle customTextStyle;
-  final CustomTextAlign customTextAlign;
-  final ImageErrorListener onImageError;
+  final String? html;
+  final CustomEdgeInsets? customEdgeInsets;
+  final CustomTextStyle? customTextStyle;
+  final CustomTextAlign? customTextAlign;
+  final ImageErrorListener? onImageError;
   final TextStyle linkStyle;
-  final ImageProperties imageProperties;
-  final OnImageTap onImageTap;
+  final ImageProperties? imageProperties;
+  final OnImageTap? onImageTap;
   final bool showImages;
 
   // style elements set a default style
@@ -298,13 +298,13 @@ class HtmlRichTextParser extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String data = html;
+    String? data = html;
 
     if (renderNewlines) {
-      data = data.replaceAll("\n", "<br />");
+      data = data!.replaceAll("\n", "<br />");
     }
     dom.Document document = parser.parse(data);
-    dom.Node body = document.body;
+    dom.Node? body = document.body;
 
     List<Widget> widgetList = new List<Widget>();
     ParseContext parseContext = ParseContext(
@@ -320,14 +320,14 @@ class HtmlRichTextParser extends StatelessWidget {
     widgetList.forEach((dynamic w) {
       if (w is BlockText) {
         if (w.child.text == null) return;
-        TextSpan childTextSpan = w.child.text;
-        if ((childTextSpan.text == null || childTextSpan.text.isEmpty) &&
-            (childTextSpan.children == null || childTextSpan.children.isEmpty))
+        TextSpan childTextSpan = w.child.text as TextSpan;
+        if ((childTextSpan.text == null || childTextSpan.text!.isEmpty) &&
+            (childTextSpan.children == null || childTextSpan.children!.isEmpty))
           return;
       } else if (w is LinkBlock) {
         if (w.children.isEmpty) return;
       } else if (w is LinkTextSpan) {
-        if (w.text.isEmpty && w.children.isEmpty) return;
+        if (w.text!.isEmpty && w.children!.isEmpty) return;
       }
       children.add(w);
     });
@@ -351,7 +351,7 @@ class HtmlRichTextParser extends StatelessWidget {
   //
   // each iteration creates a new parseContext as a copy of the previous one if it needs to
   void _parseNode(
-      dom.Node node, ParseContext parseContext, BuildContext buildContext) {
+      dom.Node? node, ParseContext parseContext, BuildContext buildContext) {
     // TEXT ONLY NODES
     // a text only node is a child of a tag with no inner html
     if (node is dom.Text) {
@@ -401,7 +401,7 @@ class HtmlRichTextParser extends StatelessWidget {
       // need to honor the indent and styling specified by that block style.
       // e.g. ol, ul, blockquote
       bool treatLikeBlock =
-          ['blockquote', 'ul', 'ol'].indexOf(parseContext.blockType) != -1;
+          ['blockquote', 'ul', 'ol'].indexOf(parseContext.blockType!) != -1;
 
       // if there is no parentElement, contain the span in a BlockText
       if (parseContext.parentElement == null) {
@@ -409,13 +409,13 @@ class HtmlRichTextParser extends StatelessWidget {
         // but the context is not actually a block, create a block
         // and append it to the root widget tree
         if (treatLikeBlock) {
-          Decoration decoration;
+          Decoration? decoration;
           if (parseContext.blockType == 'blockquote') {
             decoration = BoxDecoration(
               border:
                   Border(left: BorderSide(color: Colors.black38, width: 2.0)),
             );
-            parseContext.childStyle = parseContext.childStyle.merge(TextStyle(
+            parseContext.childStyle = parseContext.childStyle!.merge(TextStyle(
               fontStyle: FontStyle.italic,
             ));
           }
@@ -432,9 +432,9 @@ class HtmlRichTextParser extends StatelessWidget {
               text: span,
             ),
           );
-          parseContext.rootWidgetList.add(blockText);
+          parseContext.rootWidgetList!.add(blockText);
         } else {
-          parseContext.rootWidgetList.add(BlockText(
+          parseContext.rootWidgetList!.add(BlockText(
             child: RichText(text: span),
             shrinkToFit: shrinkToFit,
           ));
@@ -523,7 +523,7 @@ class HtmlRichTextParser extends StatelessWidget {
           case "sub":
             childStyle = childStyle.merge(
               TextStyle(
-                fontSize: childStyle.fontSize * OFFSET_TAGS_FONT_SIZE_FACTOR,
+                fontSize: childStyle.fontSize! * OFFSET_TAGS_FONT_SIZE_FACTOR,
               ),
             );
             break;
@@ -561,7 +561,7 @@ class HtmlRichTextParser extends StatelessWidget {
         }
 
         if (customTextStyle != null) {
-          final TextStyle customStyle = customTextStyle(node, childStyle);
+          final TextStyle customStyle = customTextStyle!(node, childStyle);
           if (customStyle != null) {
             childStyle = customStyle;
           }
@@ -579,7 +579,7 @@ class HtmlRichTextParser extends StatelessWidget {
             // if this item has block children, we create
             // a container and gesture recognizer for the entire
             // element, otherwise, we create a LinkTextSpan
-            String url = node.attributes['href'] ?? null;
+            String? url = node.attributes['href'] ?? null;
 
             if (_hasBlockChild(node)) {
               LinkBlock linkContainer = LinkBlock(
@@ -590,9 +590,9 @@ class HtmlRichTextParser extends StatelessWidget {
                 children: <Widget>[],
               );
               nextContext.parentElement = linkContainer;
-              nextContext.rootWidgetList.add(linkContainer);
+              nextContext.rootWidgetList!.add(linkContainer);
             } else {
-              TextStyle _linkStyle = parseContext.childStyle.merge(linkStyle);
+              TextStyle _linkStyle = parseContext.childStyle!.merge(linkStyle);
               LinkTextSpan span = LinkTextSpan(
                 style: _linkStyle,
                 url: url,
@@ -609,7 +609,7 @@ class HtmlRichTextParser extends StatelessWidget {
                       left: parseContext.indentLevel * indentSize, top: 10.0),
                   child: RichText(text: span),
                 );
-                parseContext.rootWidgetList.add(blockElement);
+                parseContext.rootWidgetList!.add(blockElement);
                 nextContext.inBlock = true;
               }
               nextContext.childStyle = linkStyle;
@@ -632,7 +632,7 @@ class HtmlRichTextParser extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[],
             );
-            nextContext.rootWidgetList.add(Container(
+            nextContext.rootWidgetList!.add(Container(
                 margin: EdgeInsets.symmetric(vertical: 12.0),
                 child: nextContext.parentElement));
             break;
@@ -645,18 +645,18 @@ class HtmlRichTextParser extends StatelessWidget {
 
           case "td":
           case "th":
-            int colspan = 1;
+            int? colspan = 1;
             if (node.attributes['colspan'] != null) {
-              colspan = int.tryParse(node.attributes['colspan']);
+              colspan = int.tryParse(node.attributes['colspan']!);
             }
-            nextContext.childStyle = nextContext.childStyle.merge(TextStyle(
+            nextContext.childStyle = nextContext.childStyle!.merge(TextStyle(
                 fontWeight: (node.localName == 'th')
                     ? FontWeight.bold
                     : FontWeight.normal));
             RichText text =
                 RichText(text: TextSpan(text: '', children: <TextSpan>[]));
             Expanded cell = Expanded(
-              flex: colspan,
+              flex: colspan!,
               child: Container(padding: EdgeInsets.all(1.0), child: text),
             );
             nextContext.parentElement.children.add(cell);
@@ -708,7 +708,7 @@ class HtmlRichTextParser extends StatelessWidget {
 
         if (customTextStyle != null) {
           final TextStyle customStyle =
-              customTextStyle(node, nextContext.childStyle);
+              customTextStyle!(node, nextContext.childStyle);
           if (customStyle != null) {
             nextContext.childStyle = customStyle;
           }
@@ -722,17 +722,17 @@ class HtmlRichTextParser extends StatelessWidget {
         parseContext.parentElement = null;
         TextAlign textAlign = TextAlign.left;
         if (customTextAlign != null) {
-          textAlign = customTextAlign(node) ?? textAlign;
+          textAlign = customTextAlign!(node) ?? textAlign;
         }
 
-        EdgeInsets _customEdgeInsets;
+        EdgeInsets? _customEdgeInsets;
         if (customEdgeInsets != null) {
-          _customEdgeInsets = customEdgeInsets(node);
+          _customEdgeInsets = customEdgeInsets!(node);
         }
 
         switch (node.localName) {
           case "hr":
-            parseContext.rootWidgetList
+            parseContext.rootWidgetList!
                 .add(Divider(height: 1.0, color: Colors.black38));
             break;
           case "img":
@@ -740,28 +740,28 @@ class HtmlRichTextParser extends StatelessWidget {
               if (node.attributes['src'] != null) {
                 final width = imageProperties?.width ??
                     ((node.attributes['width'] != null)
-                        ? double.tryParse(node.attributes['width'])
+                        ? double.tryParse(node.attributes['width']!)
                         : null);
                 final height = imageProperties?.height ??
                     ((node.attributes['height'] != null)
-                        ? double.tryParse(node.attributes['height'])
+                        ? double.tryParse(node.attributes['height']!)
                         : null);
 
-                if (node.attributes['src'].startsWith("data:image") &&
-                    node.attributes['src'].contains("base64,")) {
+                if (node.attributes['src']!.startsWith("data:image") &&
+                    node.attributes['src']!.contains("base64,")) {
                   precacheImage(
                     MemoryImage(
                       base64.decode(
-                        node.attributes['src'].split("base64,")[1].trim(),
+                        node.attributes['src']!.split("base64,")[1].trim(),
                       ),
                     ),
                     buildContext,
                     onError: onImageError ?? (_, __) {},
                   );
-                  parseContext.rootWidgetList.add(GestureDetector(
+                  parseContext.rootWidgetList!.add(GestureDetector(
                     child: Image.memory(
                       base64.decode(
-                          node.attributes['src'].split("base64,")[1].trim()),
+                          node.attributes['src']!.split("base64,")[1].trim()),
                       width: (width ?? -1) > 0 ? width : null,
                       height: (height ?? -1) > 0 ? width : null,
                       scale: imageProperties?.scale ?? 1.0,
@@ -783,18 +783,18 @@ class HtmlRichTextParser extends StatelessWidget {
                     ),
                     onTap: () {
                       if (onImageTap != null) {
-                        onImageTap(node.attributes['src']);
+                        onImageTap!(node.attributes['src']);
                       }
                     },
                   ));
-                } else if (node.attributes['src'].startsWith('asset:')) {
-                  final assetPath = node.attributes['src'].replaceFirst('asset:', '');
+                } else if (node.attributes['src']!.startsWith('asset:')) {
+                  final assetPath = node.attributes['src']!.replaceFirst('asset:', '');
                   precacheImage(
                     AssetImage(assetPath),
                     buildContext,
                     onError: onImageError ?? (_, __) {},
                   );
-                  parseContext.rootWidgetList.add(GestureDetector(
+                  parseContext.rootWidgetList!.add(GestureDetector(
                     child: Image.asset(
                       assetPath,
                       frameBuilder: (context, child, frame, _) {
@@ -836,19 +836,19 @@ class HtmlRichTextParser extends StatelessWidget {
                     ),
                     onTap: () {
                       if (onImageTap != null) {
-                        onImageTap(node.attributes['src']);
+                        onImageTap!(node.attributes['src']);
                       }
                     },
                   ));
                 } else {
                   precacheImage(
-                    NetworkImage(node.attributes['src']),
+                    NetworkImage(node.attributes['src']!),
                     buildContext,
                     onError: onImageError ?? (_, __) {},
                   );
-                  parseContext.rootWidgetList.add(GestureDetector(
+                  parseContext.rootWidgetList!.add(GestureDetector(
                     child: Image.network(
-                      node.attributes['src'],
+                      node.attributes['src']!,
                       frameBuilder: (context, child, frame, _) {
                         if (node.attributes['alt'] != null && frame == null) {
                           return BlockText(
@@ -888,7 +888,7 @@ class HtmlRichTextParser extends StatelessWidget {
                     ),
                     onTap: () {
                       if (onImageTap != null) {
-                        onImageTap(node.attributes['src']);
+                        onImageTap!(node.attributes['src']);
                       }
                     },
                   ));
@@ -918,39 +918,39 @@ class HtmlRichTextParser extends StatelessWidget {
                 ),
               ),
             );
-            parseContext.rootWidgetList.add(blockText);
+            parseContext.rootWidgetList!.add(blockText);
             nextContext.parentElement = blockText.child.text;
             nextContext.spansOnly = true;
             nextContext.inBlock = true;
             break;
 
           case "h1":
-            nextContext.childStyle = nextContext.childStyle.merge(
+            nextContext.childStyle = nextContext.childStyle!.merge(
               TextStyle(fontSize: 26.0, fontWeight: FontWeight.bold),
             );
             continue myDefault;
           case "h2":
-            nextContext.childStyle = nextContext.childStyle.merge(
+            nextContext.childStyle = nextContext.childStyle!.merge(
               TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold),
             );
             continue myDefault;
           case "h3":
-            nextContext.childStyle = nextContext.childStyle.merge(
+            nextContext.childStyle = nextContext.childStyle!.merge(
               TextStyle(fontSize: 22.0, fontWeight: FontWeight.bold),
             );
             continue myDefault;
           case "h4":
-            nextContext.childStyle = nextContext.childStyle.merge(
+            nextContext.childStyle = nextContext.childStyle!.merge(
               TextStyle(fontSize: 20.0, fontWeight: FontWeight.w100),
             );
             continue myDefault;
           case "h5":
-            nextContext.childStyle = nextContext.childStyle.merge(
+            nextContext.childStyle = nextContext.childStyle!.merge(
               TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
             );
             continue myDefault;
           case "h6":
-            nextContext.childStyle = nextContext.childStyle.merge(
+            nextContext.childStyle = nextContext.childStyle!.merge(
               TextStyle(fontSize: 18.0, fontWeight: FontWeight.w100),
             );
             continue myDefault;
@@ -966,13 +966,13 @@ class HtmlRichTextParser extends StatelessWidget {
 
           myDefault:
           default:
-            Decoration decoration;
+            Decoration? decoration;
             if (parseContext.blockType == 'blockquote') {
               decoration = BoxDecoration(
                 border:
                     Border(left: BorderSide(color: Colors.black38, width: 2.0)),
               );
-              nextContext.childStyle = nextContext.childStyle.merge(TextStyle(
+              nextContext.childStyle = nextContext.childStyle!.merge(TextStyle(
                 fontStyle: FontStyle.italic,
               ));
             }
@@ -996,7 +996,7 @@ class HtmlRichTextParser extends StatelessWidget {
                 ),
               ),
             );
-            parseContext.rootWidgetList.add(blockText);
+            parseContext.rootWidgetList!.add(blockText);
             nextContext.parentElement = blockText.child.text;
             nextContext.spansOnly = true;
             nextContext.inBlock = true;
@@ -1004,7 +1004,7 @@ class HtmlRichTextParser extends StatelessWidget {
 
         if (customTextStyle != null) {
           final TextStyle customStyle =
-              customTextStyle(node, nextContext.childStyle);
+              customTextStyle!(node, nextContext.childStyle);
           if (customStyle != null) {
             nextContext.childStyle = customStyle;
           }

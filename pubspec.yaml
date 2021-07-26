@@ -5,11 +5,11 @@ author: Matthew Whitaker <sub6resources@gmail.com>
 homepage: https://github.com/Sub6Resources/flutter_html
 
 environment:
-  sdk: '>=1.19.0 <3.0.0'
-  flutter: '>=0.5.0'
+  sdk: '>=2.12.0 <3.0.0'
+  flutter: '>=1.22.2'
 
 dependencies:
-  html: ^0.14.0
+  html: ^0.15.0
   flutter:
     sdk: flutter
 

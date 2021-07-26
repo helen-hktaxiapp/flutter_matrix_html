@@ -65,7 +65,7 @@ void main() {
   testWidgets("Check that tapping on the `a` tag calls the callback",
       (tester) async {
     String html = "<a href='https://github.com'>Test link</a>";
-    String urlTapped;
+    String? urlTapped;
 
     await tester.pumpWidget(
       MaterialApp(
@@ -88,7 +88,7 @@ void main() {
       "Check that tapping on the `a` tag calls the callback `RichText` parser",
       (tester) async {
     String html = "<a href='https://github.com'>Test link</a>";
-    String urlTapped;
+    String? urlTapped;
 
     await tester.pumpWidget(
       MaterialApp(

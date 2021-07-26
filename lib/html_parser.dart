@@ -7,7 +7,7 @@ import 'package:html/parser.dart' as parser;
 
 class HtmlOldParser extends StatelessWidget {
   HtmlOldParser({
-    @required this.width,
+    required this.width,
     this.onLinkTap,
     this.renderNewlines = false,
     this.customRender,
@@ -21,13 +21,13 @@ class HtmlOldParser extends StatelessWidget {
     this.showImages = true,
   });
 
-  final double width;
-  final OnLinkTap onLinkTap;
+  final double? width;
+  final OnLinkTap? onLinkTap;
   final bool renderNewlines;
-  final CustomRender customRender;
-  final double blockSpacing;
-  final String html;
-  final ImageErrorListener onImageError;
+  final CustomRender? customRender;
+  final double? blockSpacing;
+  final String? html;
+  final ImageErrorListener? onImageError;
   final TextStyle linkStyle;
   final bool showImages;
 
@@ -118,21 +118,21 @@ class HtmlOldParser extends StatelessWidget {
   }
 
   ///Parses an html string and returns a list of widgets that represent the body of your html document.
-  List<Widget> parse(String data) {
+  List<Widget> parse(String? data) {
     List<Widget> widgetList = new List<Widget>();
 
     if (renderNewlines) {
-      data = data.replaceAll("\n", "<br />");
+      data = data!.replaceAll("\n", "<br />");
     }
     dom.Document document = parser.parse(data);
     widgetList.add(_parseNode(document.body));
     return widgetList;
   }
 
-  Widget _parseNode(dom.Node node) {
+  Widget _parseNode(dom.Node? node) {
     if (customRender != null) {
-      final Widget customWidget =
-          customRender(node, _parseNodeList(node.nodes));
+      final Widget? customWidget =
+          customRender!(node, _parseNodeList(node!.nodes));
       if (customWidget != null) {
         return customWidget;
       }
@@ -154,8 +154,8 @@ class HtmlOldParser extends StatelessWidget {
               ),
               onTap: () {
                 if (node.attributes.containsKey('href') && onLinkTap != null) {
-                  String url = node.attributes['href'];
-                  onLinkTap(url);
+                  String? url = node.attributes['href'];
+                  onLinkTap!(url);
                 }
               });
         case "abbr":
@@ -243,7 +243,7 @@ class HtmlOldParser extends StatelessWidget {
         case "blockquote":
           return Padding(
             padding:
-                EdgeInsets.fromLTRB(40.0, blockSpacing, 40.0, blockSpacing),
+                EdgeInsets.fromLTRB(40.0, blockSpacing!, 40.0, blockSpacing!),
             child: Container(
               width: width,
               child: Wrap(
@@ -342,7 +342,7 @@ class HtmlOldParser extends StatelessWidget {
           );
         case "dl":
           return Padding(
-              padding: EdgeInsets.only(top: blockSpacing, bottom: blockSpacing),
+              padding: EdgeInsets.only(top: blockSpacing!, bottom: blockSpacing!),
               child: Column(
                 children: _parseNodeList(node.nodes),
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -367,7 +367,7 @@ class HtmlOldParser extends StatelessWidget {
         case "figure":
           return Padding(
               padding:
-                  EdgeInsets.fromLTRB(40.0, blockSpacing, 40.0, blockSpacing),
+                  EdgeInsets.fromLTRB(40.0, blockSpacing!, 40.0, blockSpacing!),
               child: Column(
                 children: _parseNodeList(node.nodes),
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -495,31 +495,31 @@ class HtmlOldParser extends StatelessWidget {
             builder: (BuildContext context) {
               if (showImages) {
                 if (node.attributes['src'] != null) {
-                  if (node.attributes['src'].startsWith("data:image") &&
-                      node.attributes['src'].contains("base64,")) {
+                  if (node.attributes['src']!.startsWith("data:image") &&
+                      node.attributes['src']!.contains("base64,")) {
                     precacheImage(
                       MemoryImage(base64.decode(
-                          node.attributes['src'].split("base64,")[1].trim())),
+                          node.attributes['src']!.split("base64,")[1].trim())),
                       context,
                       onError: onImageError,
                     );
                     return Image.memory(base64.decode(
-                        node.attributes['src'].split("base64,")[1].trim()));
+                        node.attributes['src']!.split("base64,")[1].trim()));
                   }
                   precacheImage(
-                    NetworkImage(node.attributes['src']),
+                    NetworkImage(node.attributes['src']!),
                     context,
                     onError: onImageError,
                   );
-                  return Image.network(node.attributes['src']);
+                  return Image.network(node.attributes['src']!);
                 } else if (node.attributes['alt'] != null) {
                   //Temp fix for https://github.com/flutter/flutter/issues/736
-                  if (node.attributes['alt'].endsWith(" ")) {
+                  if (node.attributes['alt']!.endsWith(" ")) {
                     return Container(
                         padding: EdgeInsets.only(right: 2.0),
-                        child: Text(node.attributes['alt']));
+                        child: Text(node.attributes['alt']!));
                   } else {
-                    return Text(node.attributes['alt']);
+                    return Text(node.attributes['alt']!);
                   }
                 }
               }
@@ -545,7 +545,7 @@ class HtmlOldParser extends StatelessWidget {
             ),
           );
         case "li":
-          String type = node.parent.localName; // Parent type; usually ol or ul
+          String? type = node.parent!.localName; // Parent type; usually ol or ul
           const EdgeInsets markPadding = EdgeInsets.symmetric(horizontal: 4.0);
           Widget mark;
           switch (type) {
@@ -553,7 +553,7 @@ class HtmlOldParser extends StatelessWidget {
               mark = Container(child: Text('•'), padding: markPadding);
               break;
             case "ol":
-              int index = node.parent.children.indexOf(node) + 1;
+              int index = node.parent!.children.indexOf(node) + 1;
               mark = Container(child: Text("$index."), padding: markPadding);
               break;
             default: //Fallback to middle dot
@@ -614,7 +614,7 @@ class HtmlOldParser extends StatelessWidget {
           );
         case "p":
           return Padding(
-            padding: EdgeInsets.only(top: blockSpacing, bottom: blockSpacing),
+            padding: EdgeInsets.only(top: blockSpacing!, bottom: blockSpacing!),
             child: Container(
               width: width,
               child: Wrap(
@@ -626,7 +626,7 @@ class HtmlOldParser extends StatelessWidget {
           );
         case "pre":
           return Padding(
-            padding: EdgeInsets.all(blockSpacing),
+            padding: EdgeInsets.all(blockSpacing!),
             child: DefaultTextStyle.merge(
               child: Text(node.innerHtml),
               style: const TextStyle(
@@ -741,7 +741,7 @@ class HtmlOldParser extends StatelessWidget {
                   text: node.text,
                   style: parentStyle.merge(TextStyle(
                       fontSize:
-                          parentStyle.fontSize * OFFSET_TAGS_FONT_SIZE_FACTOR)),
+                          parentStyle.fontSize! * OFFSET_TAGS_FONT_SIZE_FACTOR)),
                 ),
                 textDirection: TextDirection.ltr);
             painter.layout();
@@ -772,7 +772,7 @@ class HtmlOldParser extends StatelessWidget {
                           top: node.localName == "sub" ? null : 0,
                         ),
                         style: TextStyle(
-                            fontSize: parentStyle.fontSize *
+                            fontSize: parentStyle.fontSize! *
                                 OFFSET_TAGS_FONT_SIZE_FACTOR),
                       )
                     ],
@@ -792,12 +792,12 @@ class HtmlOldParser extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
           );
         case "td":
-          int colspan = 1;
+          int? colspan = 1;
           if (node.attributes['colspan'] != null) {
-            colspan = int.tryParse(node.attributes['colspan']);
+            colspan = int.tryParse(node.attributes['colspan']!);
           }
           return Expanded(
-            flex: colspan,
+            flex: colspan!,
             child: Wrap(
               crossAxisAlignment: WrapCrossAlignment.center,
               children: _parseNodeList(node.nodes),
@@ -812,13 +812,13 @@ class HtmlOldParser extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
           );
         case "th":
-          int colspan = 1;
+          int? colspan = 1;
           if (node.attributes['colspan'] != null) {
-            colspan = int.tryParse(node.attributes['colspan']);
+            colspan = int.tryParse(node.attributes['colspan']!);
           }
           return DefaultTextStyle.merge(
             child: Expanded(
-              flex: colspan,
+              flex: colspan!,
               child: Wrap(
                 crossAxisAlignment: WrapCrossAlignment.center,
                 alignment: WrapAlignment.center,
@@ -918,20 +918,20 @@ class HtmlOldParser extends StatelessWidget {
   }
 
   bool _isNotFirstBreakTag(dom.Node node) {
-    int index = node.parentNode.nodes.indexOf(node);
+    int index = node.parentNode!.nodes.indexOf(node);
     if (index == 0) {
       if (node.parentNode == null) {
         return false;
       }
-      return _isNotFirstBreakTag(node.parentNode);
-    } else if (node.parentNode.nodes[index - 1] is dom.Element) {
-      if ((node.parentNode.nodes[index - 1] as dom.Element).localName == "br") {
+      return _isNotFirstBreakTag(node.parentNode!);
+    } else if (node.parentNode!.nodes[index - 1] is dom.Element) {
+      if ((node.parentNode!.nodes[index - 1] as dom.Element).localName == "br") {
         return true;
       }
       return false;
-    } else if (node.parentNode.nodes[index - 1] is dom.Text) {
-      if ((node.parentNode.nodes[index - 1] as dom.Text).text.trim() == "") {
-        return _isNotFirstBreakTag(node.parentNode.nodes[index - 1]);
+    } else if (node.parentNode!.nodes[index - 1] is dom.Text) {
+      if ((node.parentNode!.nodes[index - 1] as dom.Text).text.trim() == "") {
+        return _isNotFirstBreakTag(node.parentNode!.nodes[index - 1]);
       } else {
         return false;
       }
