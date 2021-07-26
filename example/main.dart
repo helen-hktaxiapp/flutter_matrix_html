@@ -19,9 +19,9 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key? key, this.title}) : super(key: key);
+  MyHomePage({Key key, this.title}) : super(key: key);
 
-  final String? title;
+  final String title;
 
   @override
   _MyHomePageState createState() => new _MyHomePageState();
@@ -32,7 +32,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return new Scaffold(
       appBar: new AppBar(
-        title: new Text(widget.title!),
+        title: new Text(widget.title),
       ),
       body: new Center(
         child: SingleChildScrollView(
@@ -71,7 +71,7 @@ class _MyHomePageState extends State<MyHomePage> {
         In the example below, usernames are shown along with the number of points in a contest.
         If the bdi element is not supported in the browser, the username of the Arabic user would confuse the text (the bidirectional algorithm would put the colon and the number "90" next to the word "User" rather than next to the word "points").
         </p>
-        
+
         <ul>
          <li>User <bdi>hrefs</bdi>: 60 points</li>
          <li>User <bdi>jdoe</bdi>: 80 points</li>
@@ -151,14 +151,14 @@ class _MyHomePageState extends State<MyHomePage> {
               }
               return null;
             },
-            customTextStyle: (dom.Node node, TextStyle? baseStyle) {
+            customTextStyle: (dom.Node node, TextStyle baseStyle) {
               if (node is dom.Element) {
                 switch (node.localName) {
                   case "p":
-                    return baseStyle!.merge(TextStyle(height: 2, fontSize: 20));
+                    return baseStyle.merge(TextStyle(height: 2, fontSize: 20));
                 }
               }
-              return baseStyle!;
+              return baseStyle;
             },
           ),
         ),
