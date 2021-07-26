@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
 class Spoiler extends StatefulWidget {
-  final Widget child;
-  final String reason;
+  final Widget? child;
+  final String? reason;
 
   const Spoiler({
-    Key key,
+    Key? key,
     this.child,
     this.reason,
   }) : super(key: key);
@@ -24,15 +24,15 @@ class _SpoilerState extends State<Spoiler> {
         absorbing: hidden,
         child: Wrap(
           children: <Widget>[
-            if (this.widget.reason != null && this.widget.reason.isNotEmpty)
+            if (this.widget.reason != null && this.widget.reason!.isNotEmpty)
               Padding(
                 padding: EdgeInsets.only(
-                  top: DefaultTextStyle.of(context).style.fontSize * 0.15,
+                  top: DefaultTextStyle.of(context).style.fontSize! * 0.15,
                 ),
                 child: Text(
                   "(${this.widget.reason})",
                   style: TextStyle(
-                    fontSize: DefaultTextStyle.of(context).style.fontSize * 0.7,
+                    fontSize: DefaultTextStyle.of(context).style.fontSize! * 0.7,
                   ),
                 ),
               ),

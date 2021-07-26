@@ -12,12 +12,12 @@ typedef SetCodeLanguage = FutureOr<void> Function(String key, String value);
 typedef GetCodeLanguage = FutureOr<String> Function(String key);
 
 class CodeBlock extends StatefulWidget {
-  final String code;
-  final String language;
-  final SetCodeLanguage setCodeLanguage;
-  final GetCodeLanguage getCodeLanguage;
-  final Color borderColor;
-  final int maxLines;
+  final String? code;
+  final String? language;
+  final SetCodeLanguage? setCodeLanguage;
+  final GetCodeLanguage? getCodeLanguage;
+  final Color? borderColor;
+  final int? maxLines;
   CodeBlock(this.code,
       {this.language,
       this.setCodeLanguage,
@@ -33,7 +33,7 @@ final _detectionMap = <String, String>{};
 final _futureDetectionMap = <String, Future<String>>{};
 
 class _CodeBlockState extends State<CodeBlock> {
-  String language = 'plain';
+  String? language = 'plain';
   final _verticalScrollController = ScrollController();
   final _horizontalScrollController = ScrollController();
 
@@ -41,26 +41,26 @@ class _CodeBlockState extends State<CodeBlock> {
   void initState() {
     super.initState();
     if (widget.language == null) {
-      final hashKey = sha1.convert(utf8.encode(widget.code)).toString();
+      final hashKey = sha1.convert(utf8.encode(widget.code!)).toString();
       if (_detectionMap[hashKey] != null) {
         language = _detectionMap[hashKey];
       } else {
         _futureDetectionMap[hashKey] ??= () async {
           if (widget.getCodeLanguage != null) {
-            final lang = await widget.getCodeLanguage(hashKey);
+            final lang = await widget.getCodeLanguage!(hashKey);
             if (lang != null) {
               return lang;
             }
           }
-          return _autodetectLanguage(widget.code);
+          return _autodetectLanguage(widget.code!);
         }();
-        _futureDetectionMap[hashKey].then((String lang) async {
+        _futureDetectionMap[hashKey]!.then((String lang) async {
           _detectionMap[hashKey] = lang;
           if (widget.setCodeLanguage != null) {
-            await widget.setCodeLanguage(hashKey, lang);
+            await widget.setCodeLanguage!(hashKey, lang);
           }
           if (mounted) {
-            WidgetsBinding.instance.addPostFrameCallback((_) {
+            WidgetsBinding.instance!.addPostFrameCallback((_) {
               if (mounted) setState(() => language = lang);
             });
           }
@@ -105,7 +105,7 @@ class _CodeBlockState extends State<CodeBlock> {
                   scrollDirection: Axis.vertical,
                   controller: _verticalScrollController,
                   child: HighlightView(
-                    widget.code.replaceAll(RegExp(r'\n$'), ''),
+                    widget.code!.replaceAll(RegExp(r'\n$'), ''),
                     language: language,
                     tabSize: 4,
                     theme: monokaiTheme,
@@ -125,11 +125,11 @@ class _CodeBlockState extends State<CodeBlock> {
 }
 
 class AsyncMutex {
-  Completer<void> _completer;
+  Completer<void>? _completer;
 
   Future<void> lock() async {
     while (_completer != null) {
-      await _completer.future;
+      await _completer!.future;
     }
 
     _completer = Completer<void>();
@@ -137,7 +137,7 @@ class AsyncMutex {
 
   void unlock() {
     assert(_completer != null);
-    final completer = _completer;
+    final completer = _completer!;
     _completer = null;
     completer.complete();
   }
@@ -166,7 +166,7 @@ Future<String> _autodetectLanguage(String code) async {
   }
 }
 
-String _autodetectLanguageSync(String code) {
+String? _autodetectLanguageSync(String code) {
   final res = highlight.parse(code, autoDetection: true);
   return res.language;
 }
