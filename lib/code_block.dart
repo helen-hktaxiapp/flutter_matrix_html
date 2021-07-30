@@ -157,7 +157,7 @@ Future<String> _autodetectLanguage(String code) async {
       return 'plain';
     }
     try {
-      return (await isolate.run(_autodetectLanguageSync, code)) ?? 'plain';
+      return (await isolate.run(_autodetectLanguageSync, code));
     } finally {
       await isolate.close();
     }
